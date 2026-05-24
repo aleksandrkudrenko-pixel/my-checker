@@ -1,50 +1,78 @@
 name: Auto Proxy Checker
-
 on:
   schedule:
-    - cron: '*/30 * * * *'
-  workflow_dispatch:
+    - cron: '*/30 * * * *' # Проверка каждые 30 минут
+  workflow_dispatch: # Кнопка ручного запуска
 
 jobs:
-  update-subscription:
+  check-proxies:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
-
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download and Build Subscription
+      - name: Fetch and Smart Check Nodes
         run: |
           mkdir -p output
+          > raw_all.txt
+          
+          # 1. Скачиваем базы по вашему личному списку ссылок
+          curl -sL "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-SNI-RU-all.txt" >> raw_all.txt
+          curl -sL "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_universal.txt" >> raw_all.txt
+          curl -sL "https://raw.githubusercontent.com/zieng2/wl/main/vless_lite.txt" >> raw_all.txt
+          curl -sL "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-all.txt" >> raw_all.txt
+          # Последний файл большой, качаем аккуратно с ограничением по времени
+          curl -sL --max-time 15 "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt" >> raw_all.txt
 
-          echo "Downloading nodes..."
+          # Очищаем файлы результатов
+          > output/vless.txt
+          > output/hysteria2.txt
 
-          curl -L "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt" -o sub.txt
+          echo "Начинаем фильтрацию и проверку серверов..."
 
-          # Пробуем декодировать base64
-          base64 -d sub.txt > decoded.txt 2>/dev/null || cp sub.txt decoded.txt
+          # 2. Быстрый чекер доступности серверов (проверка хоста и порта)
+          while IFS= read -r line || [ -n "$line" ]; do
+            line=$(echo "$line" | xargs)
+            
+            # Фильтруем VLESS
+            if [[ "$line" == vless://* ]]; then
+              # Вытаскиваем домен/IP и порт из ссылки vless://uuid@host:port...
+              content="${line#vless://*@}"
+              host_port="${content%%[\?\#]*}"
+              host="${host_port%%:*}"
+              port="${host_port#*:}"
+              
+              # Если порт корректный и сервер отвечает по TCP за 1 секунду — он живой
+              if [[ "$port" =~ ^[0-9]+$ ]] && timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
+                echo "$line" >> output/vless.txt
+              fi
 
-          echo "Filtering VLESS..."
-          grep "^vless://" decoded.txt | tail -n 100 > output/vless.txt || true
+            # Фильтруем Hysteria2
+            elif [[ "$line" == hy2://* || "$line" == hysteria2://* ]]; then
+              content="${line#*://*@}"
+              host_port="${content%%[\?\#]*}"
+              host="${host_port%%:*}"
+              port="${host_port#*:}"
+              
+              # Проверяем хост (так как hy2 часто на UDP, проверяем хотя бы пинг или доступность узла)
+              if [[ "$port" =~ ^[0-9]+$ ]] && timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
+                echo "$line" >> output/hysteria2.txt
+              fi
+            fi
+          done < raw_all.txt
 
-          echo "Filtering Hysteria2..."
-          grep -E "^(hy2|hysteria2|hysteria)://" decoded.txt | tail -n 100 > output/hysteria2.txt || true
+          # Удаляем дубликаты и оставляем топ-50 самых быстрых ответивших
+          sort -u output/vless.txt | tail -n 50 > tmp_v.txt && mv tmp_v.txt output/vless.txt
+          sort -u output/hysteria2.txt | tail -n 50 > tmp_h.txt && mv tmp_h.txt output/hysteria2.txt
+          
+          echo "Проверка завершена. Найдено живых VLESS: $(wc -l < output/vless.txt), Hysteria2: $(wc -l < output/hysteria2.txt)"
 
-          # Общий файл подписки
-          cat output/vless.txt output/hysteria2.txt > output/subscription.txt
-
-          echo "Done"
-
-      - name: Commit files
+      - name: Commit and Push Changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
           git add output/
-
-          git commit -m "Auto update subscription" || exit 0
-
-          git push
+          git commit -m "Update checked working nodes" || exit 0
+          git push origin main
