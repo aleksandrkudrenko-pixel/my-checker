@@ -1,8 +1,8 @@
 name: Auto Proxy Checker
 on:
   schedule:
-    - cron: '*/30 * * * *' # Проверка каждые 30 минут
-  workflow_dispatch: # Кнопка ручного запуска
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 jobs:
   check-proxies:
@@ -13,61 +13,47 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch and Smart Check Nodes
+      - name: Fetch and Safe Check Nodes
         run: |
           mkdir -p output
           > raw_all.txt
           
-          # 1. Скачиваем базы по вашему личному списку ссылок
+          # 1. Скачиваем базы по вашему списку ссылок
           curl -sL "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-SNI-RU-all.txt" >> raw_all.txt
           curl -sL "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_universal.txt" >> raw_all.txt
           curl -sL "https://raw.githubusercontent.com/zieng2/wl/main/vless_lite.txt" >> raw_all.txt
           curl -sL "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-all.txt" >> raw_all.txt
-          # Последний файл большой, качаем аккуратно с ограничением по времени
           curl -sL --max-time 15 "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt" >> raw_all.txt
 
-          # Очищаем файлы результатов
           > output/vless.txt
           > output/hysteria2.txt
 
-          echo "Начинаем фильтрацию и проверку серверов..."
+          echo "Фильтруем и проверяем структуру..."
 
-          # 2. Быстрый чекер доступности серверов (проверка хоста и порта)
+          # 2. Безопасная фильтрация: распределяем по файлам только корректные строки
           while IFS= read -r line || [ -n "$line" ]; do
             line=$(echo "$line" | xargs)
             
-            # Фильтруем VLESS
-            if [[ "$line" == vless://* ]]; then
-              # Вытаскиваем домен/IP и порт из ссылки vless://uuid@host:port...
-              content="${line#vless://*@}"
-              host_port="${content%%[\?\#]*}"
-              host="${host_port%%:*}"
-              port="${host_port#*:}"
-              
-              # Если порт корректный и сервер отвечает по TCP за 1 секунду — он живой
-              if [[ "$port" =~ ^[0-9]+$ ]] && timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
-                echo "$line" >> output/vless.txt
-              fi
-
-            # Фильтруем Hysteria2
-            elif [[ "$line" == hy2://* || "$line" == hysteria2://* ]]; then
-              content="${line#*://*@}"
-              host_port="${content%%[\?\#]*}"
-              host="${host_port%%:*}"
-              port="${host_port#*:}"
-              
-              # Проверяем хост (так как hy2 часто на UDP, проверяем хотя бы пинг или доступность узла)
-              if [[ "$port" =~ ^[0-9]+$ ]] && timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
-                echo "$line" >> output/hysteria2.txt
-              fi
+            # Проверяем, что строка не пустая и содержит правильный формат
+            if [[ "$line" == vless://* && "$line" == *@*:* ]]; then
+              echo "$line" >> output/vless.txt
+            elif [[ ( "$line" == hy2://* || "$line" == hysteria2://* ) && "$line" == *@*:* ]]; then
+              echo "$line" >> output/hysteria2.txt
             fi
           done < raw_all.txt
 
-          # Удаляем дубликаты и оставляем топ-50 самых быстрых ответивших
-          sort -u output/vless.txt | tail -n 50 > tmp_v.txt && mv tmp_v.txt output/vless.txt
-          sort -u output/hysteria2.txt | tail -n 50 > tmp_h.txt && mv tmp_h.txt output/hysteria2.txt
-          
-          echo "Проверка завершена. Найдено живых VLESS: $(wc -l < output/vless.txt), Hysteria2: $(wc -l < output/hysteria2.txt)"
+          # Удаляем дубликаты и оставляем топ-60 свежих записей
+          if [ -s output/vless.txt ]; then
+            sort -u output/vless.txt | tail -n 60 > tmp_v.txt && mv tmp_v.txt output/vless.txt
+          else
+            echo "" > output/vless.txt
+          fi
+
+          if [ -s output/hysteria2.txt ]; then
+            sort -u output/hysteria2.txt | tail -n 60 > tmp_h.txt && mv tmp_h.txt output/hysteria2.txt
+          else
+            echo "" > output/hysteria2.txt
+          fi
 
       - name: Commit and Push Changes
         run: |
