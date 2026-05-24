@@ -1,34 +1,50 @@
 name: Auto Proxy Checker
+
 on:
   schedule:
     - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
-  check-proxies:
+  update-subscription:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch and Filter Nodes
+      - name: Download and Build Subscription
         run: |
           mkdir -p output
-          
-          # Скачиваем стабильный и легкий агрегатор (разбитый по протоколам)
-          curl -sL "https://raw.githubusercontent.com/alswl/v2ray-share/master/vless" -o vless_raw.txt
-          curl -sL "https://raw.githubusercontent.com/alswl/v2ray-share/master/hysteria2" -o hy2_raw.txt
-          
-          # Если скачалось успешно, берем свежие 60 серверов, иначе оставляем пустым
-          [ -s vless_raw.txt ] && tail -n 60 vless_raw.txt > output/vless.txt || echo "" > output/vless.txt
-          [ -s hy2_raw.txt ] && tail -n 60 hy2_raw.txt > output/hysteria2.txt || echo "" > output/hysteria2.txt
 
-      - name: Commit and Push Changes
+          echo "Downloading nodes..."
+
+          curl -L "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt" -o sub.txt
+
+          # Пробуем декодировать base64
+          base64 -d sub.txt > decoded.txt 2>/dev/null || cp sub.txt decoded.txt
+
+          echo "Filtering VLESS..."
+          grep "^vless://" decoded.txt | tail -n 100 > output/vless.txt || true
+
+          echo "Filtering Hysteria2..."
+          grep -E "^(hy2|hysteria2|hysteria)://" decoded.txt | tail -n 100 > output/hysteria2.txt || true
+
+          # Общий файл подписки
+          cat output/vless.txt output/hysteria2.txt > output/subscription.txt
+
+          echo "Done"
+
+      - name: Commit files
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
           git add output/
-          git commit -m "Update working nodes" || exit 0
-          git push origin main
+
+          git commit -m "Auto update subscription" || exit 0
+
+          git push
