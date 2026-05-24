@@ -2,7 +2,7 @@ name: Auto VPN Subscription
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -55,7 +55,7 @@ jobs:
 
             host=$(echo "$line" | sed -n 's/.*@\([^:?#]*\).*/\1/p')
 
-            if timeout 3 bash -c "</dev/tcp/$host/443" 2>/dev/null; then
+            if timeout 1 bash -c "</dev/tcp/$host/443" 2>/dev/null; then
               echo "$line" >> checked.txt
             fi
 
