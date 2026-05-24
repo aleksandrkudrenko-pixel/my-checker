@@ -47,23 +47,32 @@ jobs:
 
           echo "Filtering and removing duplicates..."
 
-          grep -E "^(vless|trojan|hy2|hysteria2|hysteria)://" all.txt | sort -u > clean.txt
+          grep -E "^(vless|hy2|hysteria2|hysteria)://" all.txt | sort -u > clean.txt
 
-          echo "Creating files..."
+          echo "Creating VLESS files..."
 
-          grep "^vless://" clean.txt > output/vless.txt || true
+          grep "^vless://" clean.txt | shuf > vless_all.txt
 
-          grep "^trojan://" clean.txt > output/trojan.txt || true
+          split -n l/3 vless_all.txt vless_part_
 
-          grep -E "^(hy2|hysteria2|hysteria)://" clean.txt > output/hysteria.txt || true
+          mv vless_part_aa output/vless1.txt
+          mv vless_part_ab output/vless2.txt
+          mv vless_part_ac output/vless3.txt
+
+          echo "Creating Hysteria file..."
+
+          grep -E "^(hy2|hysteria2|hysteria)://" clean.txt | shuf | head -n 300 > output/hysteria.txt || true
 
           echo "Done"
 
-          echo "VLESS:"
-          wc -l output/vless.txt || true
+          echo "VLESS1:"
+          wc -l output/vless1.txt || true
 
-          echo "TROJAN:"
-          wc -l output/trojan.txt || true
+          echo "VLESS2:"
+          wc -l output/vless2.txt || true
+
+          echo "VLESS3:"
+          wc -l output/vless3.txt || true
 
           echo "HYSTERIA:"
           wc -l output/hysteria.txt || true
