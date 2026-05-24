@@ -1,64 +1,64 @@
-name: Auto Proxy Checker
+name: Auto VPN Subscription
+
 on:
   schedule:
     - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
-  check-proxies:
+  build-subscription:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch and Safe Check Nodes
+      - name: Build subscription
         run: |
           mkdir -p output
-          > raw_all.txt
-          
-          # 1. Скачиваем базы по вашему списку ссылок
-          curl -sL "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-SNI-RU-all.txt" >> raw_all.txt
-          curl -sL "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_universal.txt" >> raw_all.txt
-          curl -sL "https://raw.githubusercontent.com/zieng2/wl/main/vless_lite.txt" >> raw_all.txt
-          curl -sL "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-all.txt" >> raw_all.txt
-          curl -sL --max-time 15 "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt" >> raw_all.txt
+          rm -f all.txt decoded.txt clean.txt
 
-          > output/vless.txt
-          > output/hysteria2.txt
+          echo "Downloading sources..."
 
-          echo "Фильтруем и проверяем структуру..."
+          curl -L "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-SNI-RU-all.txt" >> all.txt
+          echo "" >> all.txt
 
-          # 2. Безопасная фильтрация: распределяем по файлам только корректные строки
-          while IFS= read -r line || [ -n "$line" ]; do
-            line=$(echo "$line" | xargs)
-            
-            # Проверяем, что строка не пустая и содержит правильный формат
-            if [[ "$line" == vless://* && "$line" == *@*:* ]]; then
-              echo "$line" >> output/vless.txt
-            elif [[ ( "$line" == hy2://* || "$line" == hysteria2://* ) && "$line" == *@*:* ]]; then
-              echo "$line" >> output/hysteria2.txt
-            fi
-          done < raw_all.txt
+          curl -L "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-all.txt" >> all.txt
+          echo "" >> all.txt
 
-          # Удаляем дубликаты и оставляем топ-60 свежих записей
-          if [ -s output/vless.txt ]; then
-            sort -u output/vless.txt | tail -n 60 > tmp_v.txt && mv tmp_v.txt output/vless.txt
-          else
-            echo "" > output/vless.txt
-          fi
+          curl -L "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_universal.txt" >> all.txt
+          echo "" >> all.txt
 
-          if [ -s output/hysteria2.txt ]; then
-            sort -u output/hysteria2.txt | tail -n 60 > tmp_h.txt && mv tmp_h.txt output/hysteria2.txt
-          else
-            echo "" > output/hysteria2.txt
-          fi
+          curl -L "https://raw.githubusercontent.com/zieng2/wl/main/vless_lite.txt" >> all.txt
+          echo "" >> all.txt
 
-      - name: Commit and Push Changes
+          echo "Downloading aggregator..."
+
+          curl -L "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge_base64.txt" -o base64.txt
+
+          cat base64.txt | base64 -d >> all.txt || true
+
+          echo "Filtering protocols..."
+
+          grep -E "^(vless|hy2|hysteria2|hysteria)://" all.txt > clean.txt || true
+
+          echo "Removing duplicates..."
+
+          sort -u clean.txt > output/subscription.txt
+
+          echo "Total nodes:"
+          wc -l output/subscription.txt
+
+      - name: Commit and Push
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git add output/
-          git commit -m "Update checked working nodes" || exit 0
-          git push origin main
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add output/subscription.txt
+
+          git commit -m "Auto update subscription" || exit 0
+
+          git push
