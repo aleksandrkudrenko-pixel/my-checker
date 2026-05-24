@@ -1,12 +1,14 @@
 name: Auto Proxy Checker
 on:
   schedule:
-    - cron: '*/30 * * * *' # Запуск автоматически каждые 30 минут
-  workflow_dispatch: # Позволяет запускать вручную кнопкой
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 jobs:
   check-proxies:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -14,31 +16,12 @@ jobs:
       - name: Fetch and Filter Nodes
         run: |
           mkdir -p output
-          # Скачиваем тот самый рабочий пул, который у вас завелся
-          curl -sL "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt" > raw_nodes.txt
+          # Скачиваем рабочий пул
+          curl -sL "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt" -o raw_nodes.txt
           
-          # Очищаем старые файлы перед записью
-          > output/vless.txt
-          > output/hysteria2.txt
-          
-          # Робот сам перебирает базу и раскладывает серверы по двум файлам
-          while IFS= read -r line || [ -n "$line" ]; do
-            # Убираем пробелы и пустые строки
-            line=$(echo "$line" | xargs)
-            if [[ "$line" == vless://* ]]; then
-              echo "$line" >> output/vless.txt
-            elif [[ "$line" == hy2://* || "$line" == hysteria2://* ]]; then
-              echo "$line" >> output/hysteria2.txt
-            fi
-          done < raw_nodes.txt
-          
-          # Оставляем топ-60 свежих серверов каждого типа, чтобы Happ работал быстро
-          if [ -s output/vless.txt ]; then
-            tail -n 60 output/vless.txt > tmp_v.txt && mv tmp_v.txt output/vless.txt
-          fi
-          if [ -s output/hysteria2.txt ]; then
-            tail -n 60 output/hysteria2.txt > tmp_h.txt && mv tmp_h.txt output/hysteria2.txt
-          fi
+          # Фильтруем VLESS и Hysteria напрямую через поиск строк (так быстрее и без ошибок)
+          grep -E "^vless://" raw_nodes.txt | tail -n 50 > output/vless.txt || echo "" > output/vless.txt
+          grep -E "^(hy2|hysteria2)://" raw_nodes.txt | tail -n 50 > output/hysteria2.txt || echo "" > output/hysteria2.txt
 
       - name: Commit and Push Changes
         run: |
@@ -46,4 +29,4 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add output/
           git commit -m "Update working nodes" || exit 0
-          git push
+          git push origin main
