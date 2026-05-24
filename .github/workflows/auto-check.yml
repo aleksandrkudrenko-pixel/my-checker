@@ -16,10 +16,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build subscription
+      - name: Build subscriptions
         run: |
           mkdir -p output
-          rm -f all.txt decoded.txt clean.txt
+
+          rm -f all.txt clean.txt checked.txt
 
           echo "Downloading sources..."
 
@@ -35,6 +36,9 @@ jobs:
           curl -L "https://raw.githubusercontent.com/zieng2/wl/main/vless_lite.txt" >> all.txt
           echo "" >> all.txt
 
+          curl -L "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/26.txt" >> all.txt
+          echo "" >> all.txt
+
           echo "Downloading aggregator..."
 
           curl -L "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge_base64.txt" -o base64.txt
@@ -43,22 +47,46 @@ jobs:
 
           echo "Filtering protocols..."
 
-          grep -E "^(vless|hy2|hysteria2|hysteria)://" all.txt > clean.txt || true
+          grep -E "^(vless|trojan|hy2|hysteria2|hysteria)://" all.txt | sort -u > clean.txt
 
-          echo "Removing duplicates..."
+          echo "Checking servers..."
 
-          sort -u clean.txt > output/subscription.txt
+          while read line; do
 
-          echo "Total nodes:"
-          wc -l output/subscription.txt
+            host=$(echo "$line" | sed -n 's/.*@\([^:?#]*\).*/\1/p')
+
+            if timeout 3 bash -c "</dev/tcp/$host/443" 2>/dev/null; then
+              echo "$line" >> checked.txt
+            fi
+
+          done < clean.txt
+
+          echo "Creating protocol files..."
+
+          grep "^vless://" checked.txt > output/vless.txt || true
+
+          grep "^trojan://" checked.txt > output/trojan.txt || true
+
+          grep -E "^(hy2|hysteria2|hysteria)://" checked.txt > output/hysteria.txt || true
+
+          echo "Done"
+
+          echo "VLESS:"
+          wc -l output/vless.txt || true
+
+          echo "TROJAN:"
+          wc -l output/trojan.txt || true
+
+          echo "HYSTERIA:"
+          wc -l output/hysteria.txt || true
 
       - name: Commit and Push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add output/subscription.txt
+          git add output/
 
-          git commit -m "Auto update subscription" || exit 0
+          git commit -m "Auto update subscriptions" || exit 0
 
           git push
