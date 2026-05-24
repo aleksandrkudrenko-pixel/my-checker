@@ -2,7 +2,7 @@ name: Auto VPN Subscription
 
 on:
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -39,6 +39,14 @@ jobs:
           curl -L "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/26.txt" >> all.txt
           echo "" >> all.txt
 
+          echo "Downloading extra Hysteria sources..."
+
+          curl -L "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria" >> all.txt
+          echo "" >> all.txt
+
+          curl -L "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria2" >> all.txt
+          echo "" >> all.txt
+
           echo "Downloading aggregator..."
 
           curl -L "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge_base64.txt" -o base64.txt
@@ -47,7 +55,7 @@ jobs:
 
           echo "Filtering and removing duplicates..."
 
-          grep -E "^(vless|hy2|hysteria2|hysteria)://" all.txt | sort -u > clean.txt
+          grep -Ei "^(vless|hy2|hysteria2|hysteria)://" all.txt | sort -u > clean.txt
 
           echo "Creating VLESS files..."
 
@@ -61,7 +69,7 @@ jobs:
 
           echo "Creating Hysteria file..."
 
-          grep -E "^(hy2|hysteria2|hysteria)://" clean.txt | shuf | head -n 300 > output/hysteria.txt || true
+          grep -Ei "^(hy2|hysteria2|hysteria)://" clean.txt | shuf | head -n 600 > output/hysteria.txt || true
 
           echo "Done"
 
