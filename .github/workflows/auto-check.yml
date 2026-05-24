@@ -2,7 +2,7 @@ name: Auto VPN Subscription
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '0 */1 * * *'
   workflow_dispatch:
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
         run: |
           mkdir -p output
 
-          rm -f all.txt clean.txt checked.txt
+          rm -f all.txt clean.txt
 
           echo "Downloading sources..."
 
@@ -45,29 +45,17 @@ jobs:
 
           cat base64.txt | base64 -d >> all.txt || true
 
-          echo "Filtering protocols..."
+          echo "Filtering and removing duplicates..."
 
           grep -E "^(vless|trojan|hy2|hysteria2|hysteria)://" all.txt | sort -u > clean.txt
 
-          echo "Checking servers..."
+          echo "Creating files..."
 
-          while read line; do
+          grep "^vless://" clean.txt > output/vless.txt || true
 
-            host=$(echo "$line" | sed -n 's/.*@\([^:?#]*\).*/\1/p')
+          grep "^trojan://" clean.txt > output/trojan.txt || true
 
-            if timeout 1 bash -c "</dev/tcp/$host/443" 2>/dev/null; then
-              echo "$line" >> checked.txt
-            fi
-
-          done < clean.txt
-
-          echo "Creating protocol files..."
-
-          grep "^vless://" checked.txt > output/vless.txt || true
-
-          grep "^trojan://" checked.txt > output/trojan.txt || true
-
-          grep -E "^(hy2|hysteria2|hysteria)://" checked.txt > output/hysteria.txt || true
+          grep -E "^(hy2|hysteria2|hysteria)://" clean.txt > output/hysteria.txt || true
 
           echo "Done"
 
