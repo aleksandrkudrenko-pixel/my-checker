@@ -2,7 +2,7 @@ name: Auto VPN Subscription
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '23 */2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -89,6 +89,8 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+
+          date > output/updated.txt
 
           git add output/
 
