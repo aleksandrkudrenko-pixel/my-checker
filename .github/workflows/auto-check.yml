@@ -73,6 +73,11 @@ jobs:
           echo "Скачиваю lm705 alive..."
           download "https://raw.githubusercontent.com/lm705/vair/main/vless_alive.txt" > raw_lm705.txt
 
+          echo "Скачиваю luxxuria..."
+          download "https://raw.githubusercontent.com/luxxuria/harvester/main/ping_tested.txt" > raw_luxxuria_ping.txt
+          download "https://raw.githubusercontent.com/luxxuria/harvester/main/speed_tested.txt" > raw_luxxuria_speed.txt
+          download "https://raw.githubusercontent.com/luxxuria/harvester/main/top_600.txt" > raw_luxxuria_top.txt
+
           echo "Фильтрация..."
 
           grep "^vless://" raw_igareck_white.txt 2>/dev/null | grep -v "@127\.0\.0\.1" | grep -v "@\[::1\]" | grep -v "@localhost" | sort -u | shuf | head -n 300 > output/igareck_white.txt || true
@@ -81,9 +86,7 @@ jobs:
 
           grep "^vless://" raw_zieng2.txt 2>/dev/null | grep -v "@127\.0\.0\.1" | grep -v "@\[::1\]" | grep -v "@localhost" | sort -u | shuf > output/zieng2.txt || true
 
-          cat raw_igareck_white.txt raw_igareck_black.txt 2>/dev/null | grep "^trojan://" | sort -u > tmp_trojan_ig.txt || true
-          grep "^trojan://" raw_avencore.txt 2>/dev/null | sort -u > tmp_trojan_av.txt || true
-          cat tmp_trojan_ig.txt tmp_trojan_av.txt 2>/dev/null | awk '!seen[$0]++' | head -n 300 > output/trojan.txt || true
+          cat raw_igareck_white.txt raw_igareck_black.txt raw_avencore.txt 2>/dev/null | grep "^trojan://" | sort -u | head -n 300 > output/trojan.txt || true
 
           cat raw_igareck_white.txt raw_igareck_black.txt 2>/dev/null | grep "^ss://" | sort -u > tmp_ss_ig.txt || true
           grep "^ss://" raw_avencore.txt 2>/dev/null | sort -u > tmp_ss_av.txt || true
@@ -95,7 +98,11 @@ jobs:
 
           grep "^vless://" raw_lm705.txt 2>/dev/null | sort -u | shuf > output/lm705.txt || true
 
-          cat output/igareck_white.txt output/igareck_black.txt output/trojan.txt output/shadowsocks.txt output/zieng2.txt output/avencore1.txt output/avencore2.txt output/lm705.txt 2>/dev/null | shuf > output/all.txt
+          grep "^vless://" raw_luxxuria_ping.txt 2>/dev/null | sort -u | shuf > output/luxxuria_ping.txt || true
+          grep "^vless://" raw_luxxuria_speed.txt 2>/dev/null | sort -u | shuf > output/luxxuria_speed.txt || true
+          grep "^vless://" raw_luxxuria_top.txt 2>/dev/null | sort -u | shuf > output/luxxuria_top.txt || true
+
+          cat output/igareck_white.txt output/igareck_black.txt output/trojan.txt output/shadowsocks.txt output/zieng2.txt output/avencore1.txt output/avencore2.txt output/lm705.txt output/luxxuria_ping.txt output/luxxuria_speed.txt output/luxxuria_top.txt 2>/dev/null | shuf > output/all.txt
 
           date > output/updated.txt
           rm -f raw_*.txt tmp_*.txt
@@ -106,7 +113,7 @@ jobs:
       - name: Commit and Push
         run: |
           git config user.name "github-actions"
-          git config user.email "[jg:email_17]"
+          git config user.email "[jg:email_18]"
           git add output/
           git commit -m "Auto update $(date '+%Y-%m-%d %H:%M')" || exit 0
           git push
