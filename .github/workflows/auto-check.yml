@@ -81,11 +81,11 @@ jobs:
 
           grep "^vless://" raw_zieng2.txt 2>/dev/null | grep -v "@127\.0\.0\.1" | grep -v "@\[::1\]" | grep -v "@localhost" | sort -u | shuf > output/zieng2.txt || true
 
-          grep "^trojan://" raw_igareck_white.txt raw_igareck_black.txt 2>/dev/null | sed 's|^[^:]*:trojan|trojan|' | sort -u > tmp_trojan_ig.txt || true
+          cat raw_igareck_white.txt raw_igareck_black.txt 2>/dev/null | grep "^trojan://" | sort -u > tmp_trojan_ig.txt || true
           grep "^trojan://" raw_avencore.txt 2>/dev/null | sort -u > tmp_trojan_av.txt || true
           cat tmp_trojan_ig.txt tmp_trojan_av.txt 2>/dev/null | awk '!seen[$0]++' | head -n 300 > output/trojan.txt || true
 
-          grep "^ss://" raw_igareck_white.txt raw_igareck_black.txt 2>/dev/null | sed 's|^[^:]*:ss|ss|' | sort -u > tmp_ss_ig.txt || true
+          cat raw_igareck_white.txt raw_igareck_black.txt 2>/dev/null | grep "^ss://" | sort -u > tmp_ss_ig.txt || true
           grep "^ss://" raw_avencore.txt 2>/dev/null | sort -u > tmp_ss_av.txt || true
           cat tmp_ss_ig.txt tmp_ss_av.txt 2>/dev/null | awk '!seen[$0]++' | head -n 300 > output/shadowsocks.txt || true
 
@@ -106,7 +106,7 @@ jobs:
       - name: Commit and Push
         run: |
           git config user.name "github-actions"
-          git config user.email "[jg:email_16]"
+          git config user.email "[jg:email_17]"
           git add output/
           git commit -m "Auto update $(date '+%Y-%m-%d %H:%M')" || exit 0
           git push
