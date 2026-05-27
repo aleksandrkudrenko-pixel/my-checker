@@ -6,9 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-subscription:
+  build:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
 
@@ -20,80 +19,94 @@ jobs:
         run: |
           mkdir -p output
 
-          rm -f all.txt clean.txt
+          download_igareck() {
+            local file="$1"
+            local urls="
+          https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/${file}
+          https://raw.githack.com/igareck/vpn-configs-for-russia/main/${file}
+          https://gitlab.com/igareck/vpn-configs-for-russia/-/raw/main/${file}
+          https://codeberg.org/igareck/vpn-configs-for-russia/raw/branch/main/${file}
+          https://gitea.com/igareck/vpn-configs-for-russia/raw/branch/main/${file}
+          https://bitbucket.org/igareck/vpn-configs-for-russia/raw/main/${file}"
+            for url in $urls; do
+              result=$(curl -sL --connect-timeout 5 --max-time 10 "$url" 2>/dev/null)
+              if [ -n "$result" ] && [ ${#result} -gt 50 ]; then
+                echo "$result"
+                return 0
+              fi
+            done
+            return 1
+          }
 
-          echo "Downloading sources..."
+          download() {
+            local url="$1"
+            local result=""
+            result=$(curl -sL --connect-timeout 5 --max-time 10 "$url" 2>/dev/null)
+            if [ -n "$result" ] && [ ${#result} -gt 50 ]; then
+              echo "$result"
+              return 0
+            fi
+            local githack=$(echo "$url" | sed 's|raw.githubusercontent.com|raw.githack.com|' | sed 's|github.com/.*/raw/|raw.githack.com/|')
+            result=$(curl -sL --connect-timeout 5 --max-time 10 "$githack" 2>/dev/null)
+            if [ -n "$result" ] && [ ${#result} -gt 50 ]; then
+              echo "$result"
+              return 0
+            fi
+            return 1
+          }
 
-          curl -L "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-SNI-RU-all.txt" >> all.txt
-          echo "" >> all.txt
+          echo "Скачиваю igareck WHITE..."
+          download_igareck "WHITE-SNI-RU-all.txt" > raw_igareck_white.txt
+          download_igareck "WHITE-CIDR-RU-all.txt" >> raw_igareck_white.txt
+          download_igareck "Vless-Reality-White-Lists-Rus-Mobile.txt" >> raw_igareck_white.txt
 
-          curl -L "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-all.txt" >> all.txt
-          echo "" >> all.txt
+          echo "Скачиваю igareck BLACK..."
+          download_igareck "BLACK_VLESS_RUS.txt" > raw_igareck_black.txt
+          download_igareck "BLACK_VLESS_RUS_mobile.txt" >> raw_igareck_black.txt
 
-          curl -L "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_universal.txt" >> all.txt
-          echo "" >> all.txt
+          echo "Скачиваю zieng2..."
+          download "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_universal.txt" > raw_zieng2.txt
 
-          curl -L "https://raw.githubusercontent.com/zieng2/wl/main/vless_lite.txt" >> all.txt
-          echo "" >> all.txt
+          echo "Скачиваю AvenCores..."
+          download "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/26.txt" > raw_avencore.txt
 
-          curl -L "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/26.txt" >> all.txt
-          echo "" >> all.txt
+          echo "Скачиваю lm705 alive..."
+          download "https://raw.githubusercontent.com/lm705/vair/main/vless_alive.txt" > raw_lm705.txt
 
-          echo "Downloading extra Hysteria sources..."
+          echo "Фильтрация..."
 
-          curl -L "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria" >> all.txt
-          echo "" >> all.txt
+          grep "^vless://" raw_igareck_white.txt 2>/dev/null | grep -v "@127\.0\.0\.1" | grep -v "@\[::1\]" | grep -v "@localhost" | sort -u | shuf | head -n 300 > output/igareck_white.txt || true
 
-          curl -L "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria2" >> all.txt
-          echo "" >> all.txt
+          grep "^vless://" raw_igareck_black.txt 2>/dev/null | grep -v "@127\.0\.0\.1" | grep -v "@\[::1\]" | grep -v "@localhost" | sort -u | shuf | head -n 300 > output/igareck_black.txt || true
 
-          echo "Downloading aggregator..."
+          grep "^vless://" raw_zieng2.txt 2>/dev/null | grep -v "@127\.0\.0\.1" | grep -v "@\[::1\]" | grep -v "@localhost" | sort -u | shuf > output/zieng2.txt || true
 
-          curl -L "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge_base64.txt" -o base64.txt
+          grep "^trojan://" raw_igareck_white.txt raw_igareck_black.txt 2>/dev/null | sed 's|^[^:]*:trojan|trojan|' | sort -u > tmp_trojan_ig.txt || true
+          grep "^trojan://" raw_avencore.txt 2>/dev/null | sort -u > tmp_trojan_av.txt || true
+          cat tmp_trojan_ig.txt tmp_trojan_av.txt 2>/dev/null | awk '!seen[$0]++' | head -n 300 > output/trojan.txt || true
 
-          cat base64.txt | base64 -d >> all.txt || true
+          grep "^ss://" raw_igareck_white.txt raw_igareck_black.txt 2>/dev/null | sed 's|^[^:]*:ss|ss|' | sort -u > tmp_ss_ig.txt || true
+          grep "^ss://" raw_avencore.txt 2>/dev/null | sort -u > tmp_ss_av.txt || true
+          cat tmp_ss_ig.txt tmp_ss_av.txt 2>/dev/null | awk '!seen[$0]++' | head -n 300 > output/shadowsocks.txt || true
 
-          echo "Filtering and removing duplicates..."
+          grep "^vless://" raw_avencore.txt 2>/dev/null | grep -v "@127\.0\.0\.1" | grep -v "@\[::1\]" | grep -v "@localhost" | sort -u | shuf > tmp_avencore_all.txt || true
+          head -n 900 tmp_avencore_all.txt > output/avencore1.txt 2>/dev/null || true
+          tail -n +901 tmp_avencore_all.txt | head -n 900 > output/avencore2.txt 2>/dev/null || true
 
-          grep -Ei "^(vless|hy2|hysteria2|hysteria)://" all.txt | sort -u > clean.txt
+          grep "^vless://" raw_lm705.txt 2>/dev/null | sort -u | shuf > output/lm705.txt || true
 
-          echo "Creating VLESS files..."
+          cat output/igareck_white.txt output/igareck_black.txt output/trojan.txt output/shadowsocks.txt output/zieng2.txt output/avencore1.txt output/avencore2.txt output/lm705.txt 2>/dev/null | shuf > output/all.txt
 
-          grep "^vless://" clean.txt | shuf > vless_all.txt
+          date > output/updated.txt
+          rm -f raw_*.txt tmp_*.txt
 
-          split -n l/3 vless_all.txt vless_part_
-
-          mv vless_part_aa output/vless1.txt
-          mv vless_part_ab output/vless2.txt
-          mv vless_part_ac output/vless3.txt
-
-          echo "Creating Hysteria file..."
-
-          grep -Ei "^(hy2|hysteria2|hysteria)://" clean.txt | shuf | head -n 600 > output/hysteria.txt || true
-
-          echo "Done"
-
-          echo "VLESS1:"
-          wc -l output/vless1.txt || true
-
-          echo "VLESS2:"
-          wc -l output/vless2.txt || true
-
-          echo "VLESS3:"
-          wc -l output/vless3.txt || true
-
-          echo "HYSTERIA:"
-          wc -l output/hysteria.txt || true
+          echo "--- Результат ---"
+          for f in output/*.txt; do echo "$(basename $f): $(wc -l < $f)"; done
 
       - name: Commit and Push
         run: |
           git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-          date > output/updated.txt
-
+          git config user.email "[jg:email_16]"
           git add output/
-
-          git commit -m "Auto update subscriptions" || exit 0
-
+          git commit -m "Auto update $(date '+%Y-%m-%d %H:%M')" || exit 0
           git push
