@@ -113,7 +113,12 @@ jobs:
       - name: Commit and Push
         run: |
           git config user.name "github-actions"
-          git config user.email "[jg:email_18]"
+          git config user.email "[jg:email_19]"
           git add output/
           git commit -m "Auto update $(date '+%Y-%m-%d %H:%M')" || exit 0
           git push
+
+      - name: Mirror to Codeberg
+        run: |
+          git remote add codeberg https://prizrak1984:${{ secrets.CODEBERG_TOKEN }}@codeberg.org/prizrak1984/my-checker.git 2>/dev/null || true
+          git push codeberg main --force 2>/dev/null || echo "Codeberg push failed"
