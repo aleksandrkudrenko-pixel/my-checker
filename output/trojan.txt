@@ -9,9 +9,10 @@ trojan://BxceQaOe@bb.bejkn.cn:6463?security=tls&sni=t.me/ripaojiedian&type=tcp
 trojan://JaFKnqNcvnBT63t3rquidGsln@91.210.108.201:443?allowInsecure=0&sni=HL-FREEDOM-1.UNDEF.NETWORK&ws=1&wspath=/f2fc2a1f
 trojan://JaFKnqNcvnBT63t3rquidGsln@hl-freedom-1.undef.network:443?security=tls&sni=🔒&type=tcp
 trojan://MeaDiUmPlkWbZJ2BON8tz@78.159.131.12:28259?sni=ads.x5.ru&peer=ads.x5.ru&security=tls
-trojan://b49df800-061e-3282-a34c-70c864c83e8a@ascjp.ntt1.ccddn4.icu:65302?security=tls&sni=cdnjp.douyinvod.com&insecure=1&allowInsecure=1&type=tcp&headerType=none#%F0%9F%87%AF%F0%9F%87%B5%20Japan%2C%20Shibuya%20City%20%7C%20%F0%9F%8C%90%20%7C%20%5BBL%5D
-trojan://b49df800-061e-3282-a34c-70c864c83e8a@ntnt2.x2k8m9q3.top:65302?security=tls&sni=cdnjp.douyinvod.com&insecure=1&allowInsecure=1&type=tcp&headerType=none#%F0%9F%87%AF%F0%9F%87%B5%20Japan%2C%20Shibuya%20City%20%7C%20%F0%9F%8C%90%20%7C%20%5BBL%5D
 trojan://fc1e67fa@45.15.128.5:443?security=tls&sni=watchapp.store&fp=random
+trojan://gcuCpQfaiVeDBdWG@211.76.176.98:19128?security=tls&sni=yazhou10.dynu.net&type=tcp&headerType=none#%F0%9F%87%B8%F0%9F%87%AC%20Singapore%2C%20Singapore%20%7C%20%5BBL%5D
+trojan://gcuCpQfaiVeDBdWG@211.76.176.99:19128?security=tls&sni=yazhou10.dynu.net&type=tcp&headerType=none#%F0%9F%87%B8%F0%9F%87%AC%20Singapore%2C%20Singapore%20%7C%20%F0%9F%8C%90%20%7C%20%5BBL%5D
+trojan://humanity@165.215.250.14:443?path=/assignment&security=tls&host=www.calmlunch.com&fp=chrome&type=ws&sni=www.calmlunch.com#%F0%9F%8C%90%20Anycast-IP%20%7C%20%F0%9F%87%AB%F0%9F%87%B7%20%7C%20%5BBL%5D
 trojan://kkzh2prsyr2ik47as615@64.94.95.114:57142/?type=tcp&security=tls&sni=static.rutube.ru
 trojan://kkzh2prsyr2ik47as615@64.94.95.115:57142/?type=tcp&security=tls&sni=static.rutube.ru
 trojan://kkzh2prsyr2ik47as615@64.94.95.117:57142/?type=tcp&security=tls&sni=static.rutube.ru
