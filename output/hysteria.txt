@@ -1,4 +1,0 @@
-hysteria2://65bc8227-48db-4993-9e9d-68394de672a1@45.92.218.150:443/?sni=holz3.api3-max.ru#
-hysteria2://9c23940e-efd8-4763-bfb5-54739b50893d@156.226.173.8:8443/?sni=hy5.hy2yydsapi.top
-hysteria2://abc123@pl1-lite.epichost.pl:10090?sni=pl1-lite.epichost.pl
-hysteria2://65bc8227-48db-4993-9e9d-68394de672a1@45.92.218.132:443/?sni=holz6.api3-max.ru#
