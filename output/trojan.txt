@@ -15,9 +15,9 @@ trojan://kkzh2prsyr2ik47as615@64.94.95.114:57142/?type=tcp&security=tls&sni=stat
 trojan://kkzh2prsyr2ik47as615@64.94.95.115:57142/?type=tcp&security=tls&sni=static.rutube.ru
 trojan://kkzh2prsyr2ik47as615@64.94.95.117:57142/?type=tcp&security=tls&sni=static.rutube.ru
 trojan://kkzh2prsyr2ik47as615@64.94.95.118:57142?security=tls&sni=🔒
-trojan://lEjtI3pFYfU7O1UYozJcfZV5K6Fwfths@64.74.163.118:58536?allowInsecure=1&headerType=none&insecure=1&security=tls&type=tcp&sni=eh.vk.com#%F0%9F%87%A8%F0%9F%87%A6%20Canada%20%5BSNI-RU%5D%20eh.vk.com
 trojan://mitivpn@14.102.228.76:443?security=tls&sni=www.app-cloud.ir&insecure=1&allowInsecure=1&type=ws&path=/http/1.1#%F0%9F%8C%90%20Anycast-IP%20%7C%20%F0%9F%87%A8%F0%9F%87%A6%20%F0%9F%87%B8%F0%9F%87%AA%20%7C%20%5BBL%5D
 trojan://mitivpn@14.102.228.76:443?type=ws&security=tls&path=%2F%3Fed%3D2048&sni=www.app-cloud.ir&alpn=http%2F1.1&fp=chrome&allowInsecure=1#%F0%9F%8C%90%20Anycast-IP%20%7C%20%F0%9F%87%A8%F0%9F%87%A6%20%F0%9F%87%B8%F0%9F%87%AA%20%F0%9F%87%B8%F0%9F%87%AC%20%7C%20%5BBL%5D
+trojan://mitivpn@212.183.88.136:443?type=ws&security=tls&path=%2F%3Fed%3D2048&sni=www.app-cloud.ir&alpn=http%2F1.1&fp=chrome&allowInsecure=1#%F0%9F%8C%90%20Anycast-IP%20%7C%20%F0%9F%87%A8%F0%9F%87%A6%20%F0%9F%87%AC%F0%9F%87%A7%20%F0%9F%87%B7%F0%9F%87%BA%20%5B%2ACIDR%5D
 trojan://strong-secret-pass-777@103.231.73.181:4443?security=tls
 trojan://strong-secret-pass-777@45.12.146.179:4443?security=tls&type=tcp
 trojan://strong-secret-pass-777@45.15.140.128:4443?security=tls&fp=chrome
