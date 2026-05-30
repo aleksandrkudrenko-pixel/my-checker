@@ -9,6 +9,7 @@ ss://62541eb9-fa3d-4d3d-880e-ceb517dc52f0@87.239.135.116:443?encryption=none&amp
 ss://69a2af58-d74a-44ca-864a-e09b493f4274@45.66.161.10:8443?encryption=none&amp;flow=xtls-rprx-vision&amp;fp=&amp;pbk=ZxJt0FNyLrIrrd4c1Uehe86Iqk0BBbKjbP1kEJxOAAg&amp;security=reality&amp;sid=0f26cb0528&amp;sni=ya.ru&amp;type=tcp#%F0%9F%9B%A1%EF%B8%8F34@oneclickvpnkeys
 ss://749b361b-3829-4485-97e5-9aa1ddacf265@5.199.171.110:443?encryption=none&amp;flow=xtls-rprx-vision&amp;fp=&amp;pbk=AaMhgrJLE-KiNf9-KBI_n13bXSHPlhBkYMSUZxq1b3g&amp;security=reality&amp;sid=97839fc0&amp;sni=vk.com&amp;type=tcp#%F0%9F%9B%A1%EF%B8%8F73@oneclickvpnkeys
 ss://96e429ef-7e1d-4239-a4c8-c5a4861bbded@144.31.96.48:443?encryption=none&amp;flow=xtls-rprx-vision&amp;fp=&amp;pbk=nPcUKydxoRI66O3tT9O4QCZpLjOBvkGsiXG7pDX1BBw&amp;security=reality&amp;sid=6ba85179e30d4fc2&amp;sni=ya.ru&amp;type=tcp#%F0%9F%9B%A1%EF%B8%8F26@oneclickvpnkeys
+ss://Fluffy_VPN-757700MA@84.201.146.8:443?type=xhttp&security=reality&fp=chrome&pbk=KR2tU5Ozrtgk4qxx_h3Pt9LgPsQ5rjLzraod0PJFSTI&sni=max.ru&mode=auto#Join+Telegram:@Farah_VPN
 ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTo0YTJyZml4b3BoZGpmZmE4S1ZBNEFh@193.29.139.162:8080?
 ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTo0YTJyZml4b3BoZGpmZmE4S1ZBNEFh@193.29.139.173:8080?
 ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTo0YTJyZml4b3BoZGpmZmE4S1ZBNEFh@193.29.139.179:8080?
