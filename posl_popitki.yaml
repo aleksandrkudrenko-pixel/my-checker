@@ -1,0 +1,299 @@
+# ============================================================
+# CLASH META (MIHOMO) — ОПТИМИЗИРОВАННЫЙ РФ-КОНФИГ v9
+# Две авто-группы / Защита батареи / Фикс затыков
+# ============================================================
+
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: silent
+ipv6: false
+
+# --- Энергосберегающее ускорение сети ---
+tcp-concurrent: true
+unified-delay: true
+keep-alive-idle: 30              # Увеличено, чтобы реже будить процессор
+keep-alive-interval: 30
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+sniffer:
+  enable: true
+  force-dns-mapping: true
+  parse-pure-ip: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+
+# ============================================================
+# DNS — Защита от утечек + Прямой роутинг Telegram
+# ============================================================
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - '*.localhost'
+    - '+.telegram.org'
+    - '+.telegram.me'
+    - '+.t.me'
+    - '+.tdesktop.com'
+    - '+.telegra.ph'
+    - '+.telega.one'
+    - '+.yandex.ru'
+    - '+.yandex.net'
+    - '+.ya.ru'
+    - '+.mail.ru'
+    - '+.vk.com'
+    - '+.sberbank.ru'
+    - '+.tinkoff.ru'
+    - '+.gosuslugi.ru'
+    - '+.mos.ru'
+    - 'time.*.com'
+    - 'ntp.*.com'
+    - '+.pool.ntp.org'
+  default-nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+  nameserver:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+  fallback:
+    - https://1.0.0.1/dns-query
+    - https://8.8.4.4/dns-query
+  fallback-filter:
+    geoip: true
+    geoip-code: RU
+
+# ============================================================
+# PROXY PROVIDERS — Энергосберегающий режим (lazy: true здесь)
+# ============================================================
+proxy-providers:
+  speed:
+    type: http
+    url: "https://raw.githubusercontent.com/luxxuria/harvester/main/speed_tested.txt"
+    interval: 10800
+    path: ./providers/speed.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  ping:
+    type: http
+    url: "https://raw.githubusercontent.com/luxxuria/harvester/main/ping_tested.txt"
+    interval: 10800
+    path: ./providers/ping.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  alive:
+    type: http
+    url: "https://raw.githubusercontent.com/lm705/vair/main/vless_alive.txt"
+    interval: 10800
+    path: ./providers/alive.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  top600:
+    type: http
+    url: "https://raw.githubusercontent.com/luxxuria/harvester/main/top_600.txt"
+    interval: 10800
+    path: ./providers/top600.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  zieng:
+    type: http
+    url: "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_universal.txt"
+    interval: 10800
+    path: ./providers/zieng.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  reality-sni:
+    type: http
+    url: "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-SNI-RU-all.txt"
+    interval: 10800
+    path: ./providers/reality-sni.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  reality-cidr:
+    type: http
+    url: "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-all.txt"
+    interval: 10800
+    path: ./providers/reality-cidr.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  reality-mobile:
+    type: http
+    url: "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt"
+    interval: 10800
+    path: ./providers/reality-mobile.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  igareck-black:
+    type: http
+    url: "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/BLACK_VLESS_RUS.txt"
+    interval: 10800
+    path: ./providers/igareck-black.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  igareck-mobile:
+    type: http
+    url: "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/BLACK_VLESS_RUS_mobile.txt"
+    interval: 10800
+    path: ./providers/igareck-mobile.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+  avencores:
+    type: http
+    url: "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/26.txt"
+    interval: 10800
+    path: ./providers/avencores.yaml
+    health-check: {enable: true, url: "http://cp.cloudflare.com/generate_204", interval: 300, timeout: 2000, lazy: true}
+
+# ============================================================
+# PROXY GROUPS — Разделение на два сбалансированных автомата
+# ============================================================
+proxy-groups:
+
+  # Главный тумблер управления трафиком
+  - name: "🚀 PROXY"
+    type: select
+    proxies:
+      - "🎯 ГЛАВНЫЙ АВТОМАТ"
+      - "📊 ГРУППА 1: СКОРОСТЬ"
+      - "🔒 ГРУППА 2: РФ-ОБХОД"
+      - "✋ РУЧНОЙ ВЫБОР"
+      - DIRECT
+
+  # Каскадный автомат: выбирает лучшую из двух уже протестированных групп
+  - name: "🎯 ГЛАВНЫЙ АВТОМАТ"
+    type: url-test
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 120                 # Увеличено до 2 минут ради батареи
+    tolerance: 30
+    lazy: false                  # Оставляем false только тут, чтобы переключение было мгновенным
+    proxies:
+      - "📊 ГРУППА 1: СКОРОСТЬ"
+      - "🔒 ГРУППА 2: РФ-ОБХОД"
+
+  # Подгруппа 1: Глобальные быстрые листы
+  - name: "📊 ГРУППА 1: СКОРОСТЬ"
+    type: url-test
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 180                 # Редкий опрос (раз в 3 минуты) экономит заряд
+    tolerance: 40
+    lazy: true
+    use:
+      - speed
+      - ping
+      - alive
+      - top600
+      - zieng
+
+  # Подгруппа 2: Специализированные Reality листы под РФ
+  - name: "🔒 ГРУППА 2: РФ-ОБХОД"
+    type: url-test
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 180
+    tolerance: 40
+    lazy: true
+    use:
+      - reality-sni
+      - reality-cidr
+      - reality-mobile
+      - igareck-black
+      - igareck-mobile
+      - avencores
+
+  # Полный список всех серверов для ручного контроля
+  - name: "✋ РУЧНОЙ ВЫБОР"
+    type: select
+    use:
+      - speed
+      - ping
+      - alive
+      - top600
+      - zieng
+      - reality-sni
+      - reality-cidr
+      - reality-mobile
+     # - igareck-black
+    #  - igareck-mobile
+     # - avencores
+
+# ============================================================
+# RULES — Маршрутизация трафика (Без Geosite ошибок)
+# ============================================================
+rules:
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,localhost,DIRECT
+
+  # Блокировка QUIC для стабильного YouTube
+  - AND,((NETWORK,udp),(DST-PORT,443)),REJECT
+
+  # Россия напрямую
+  - DOMAIN-KEYWORD,yandex,DIRECT
+  - DOMAIN-KEYWORD,sberbank,DIRECT
+  - DOMAIN-KEYWORD,tinkoff,DIRECT
+  - DOMAIN-KEYWORD,gosuslugi,DIRECT
+  - DOMAIN-SUFFIX,ru,DIRECT
+  - DOMAIN-SUFFIX,xn--p1ai,DIRECT
+  - DOMAIN-SUFFIX,su,DIRECT
+  - DOMAIN-SUFFIX,yandex.ru,DIRECT
+  - DOMAIN-SUFFIX,yandex.net,DIRECT
+  - DOMAIN-SUFFIX,ya.ru,DIRECT
+  - DOMAIN-SUFFIX,yastatic.net,DIRECT
+  - DOMAIN-SUFFIX,vk.com,DIRECT
+  - DOMAIN-SUFFIX,vk.me,DIRECT
+  - DOMAIN-SUFFIX,userapi.com,DIRECT
+  - DOMAIN-SUFFIX,mail.ru,DIRECT
+  - DOMAIN-SUFFIX,imgsmail.ru,DIRECT
+  - DOMAIN-SUFFIX,gosuslugi.ru,DIRECT
+  - DOMAIN-SUFFIX,mos.ru,DIRECT
+  - DOMAIN-SUFFIX,nalog.gov.ru,DIRECT
+  - DOMAIN-SUFFIX,sberbank.ru,DIRECT
+  - DOMAIN-SUFFIX,sber.ru,DIRECT
+  - DOMAIN-SUFFIX,tinkoff.ru,DIRECT
+  - DOMAIN-SUFFIX,tbank.ru,DIRECT
+  - DOMAIN-SUFFIX,alfabank.ru,DIRECT
+  - DOMAIN-SUFFIX,vtb.ru,DIRECT
+  - DOMAIN-SUFFIX,wildberries.ru,DIRECT
+  - DOMAIN-SUFFIX,wb.ru,DIRECT
+  - DOMAIN-SUFFIX,wbstatic.net,DIRECT
+  - DOMAIN-SUFFIX,ozon.ru,DIRECT
+  - DOMAIN-SUFFIX,avito.ru,DIRECT
+  - DOMAIN-SUFFIX,kinopoisk.ru,DIRECT
+  - DOMAIN-SUFFIX,ivi.ru,DIRECT
+  - DOMAIN-SUFFIX,okko.tv,DIRECT
+  - DOMAIN-SUFFIX,rutube.ru,DIRECT
+  - DOMAIN-SUFFIX,2gis.ru,DIRECT
+  - DOMAIN-SUFFIX,drom.ru,DIRECT
+  - DOMAIN-SUFFIX,auto.ru,DIRECT
+  - DOMAIN-SUFFIX,hh.ru,DIRECT
+  - DOMAIN-SUFFIX,habr.com,DIRECT
+  - DOMAIN-SUFFIX,pikabu.ru,DIRECT
+  - DOMAIN-SUFFIX,rbc.ru,DIRECT
+  - DOMAIN-SUFFIX,lenta.ru,DIRECT
+  - DOMAIN-SUFFIX,ria.ru,DIRECT
+  - DOMAIN-SUFFIX,rambler.ru,DIRECT
+  - DOMAIN-SUFFIX,mts.ru,DIRECT
+  - DOMAIN-SUFFIX,megafon.ru,DIRECT
+  - DOMAIN-SUFFIX,beeline.ru,DIRECT
+  - DOMAIN-SUFFIX,tele2.ru,DIRECT
+  - DOMAIN-SUFFIX,rostelecom.ru,DIRECT
+  - DOMAIN-SUFFIX,dns-shop.ru,DIRECT
+  - DOMAIN-SUFFIX,mvideo.ru,DIRECT
+  - DOMAIN-SUFFIX,citilink.ru,DIRECT
+  - DOMAIN-SUFFIX,lamoda.ru,DIRECT
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+
+  # Вся Россия по IP — напрямую
+  - GEOIP,RU,DIRECT,no-resolve
+
+  # Всё остальное зарубежное — в каскадный автомат
+  - MATCH,🚀 PROXY
