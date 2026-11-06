@@ -1,6 +1,1 @@
-trojan://46d221fa-e9b4-748c-4eae-019a88e42991@191.44.112.170:443?security=tls&sni=orbylume.my.to&type=ws&path=%2Ftvpn-trojan%2Fbg&host=orbylume.my.to&fp=chrome#%F0%9F%87%A7%F0%9F%87%AC%20Bulgaria%2C%20Sofia%20%28Old%20City%20Center%29%20%7C%20%F0%9F%8C%90%20%7C%20%5BBL%5D
-trojan://46d221fa-e9b4-748c-4eae-019a88e42991@191.44.112.170:443?security=tls&sni=orbylume.my.to&type=ws&path=%2Ftvpn-trojan%2Fbg&host=orbylume.my.to&fp=firefox#%F0%9F%87%A7%F0%9F%87%AC%20Bulgaria%2C%20Sofia%20%28Old%20City%20Center%29%20%7C%20%F0%9F%8C%90%20%7C%20%5BBL%5D
-trojan://46d221fa-e9b4-748c-4eae-019a88e42991@191.44.112.170:443?security=tls&sni=orbylume.my.to&type=ws&path=%2Ftvpn-trojan%2Fbg&host=orbylume.my.to&fp=qq#%F0%9F%87%A7%F0%9F%87%AC%20Bulgaria%2C%20Sofia%20%28Old%20City%20Center%29%20%7C%20%F0%9F%8C%90%20%7C%20%5BBL%5D
-trojan://5t6i121em5lkmsmk@th001.zestapp778.com:33079?type=tcp&security=tls&sni=th001.zestapp778.com&fp=chrome#%F0%9F%87%B9%F0%9F%87%AD%20Thailand%2C%20Bangkok%20%7C%20%5BBL%5D
-trojan://5t6i121em5lkmsmk@th001.zestapp778.com:33079?type=tcp&security=tls&sni=th001.zestapp778.com&fp=qq#%F0%9F%87%B9%F0%9F%87%AD%20Thailand%2C%20Bangkok%20%7C%20%5BBL%5D
-trojan://5t6i121em5lkmsmk@th001.zestapp778.com:33079?type=tcp&security=tls&sni=th001.zestapp778.com&fp=safari#%F0%9F%87%B9%F0%9F%87%AD%20Thailand%2C%20Bangkok%20%7C%20%5BBL%5D
+trojan://c3d17f1d-9201-4644-b184-6cd1414c6cc5@45.196.221.31:6777?security=tls&sni=t04.emnode.top#%F0%9F%87%AD%F0%9F%87%B0%20Hong%20Kong%2C%20Hong%20Kong%20%7C%20%5BBL%5D
